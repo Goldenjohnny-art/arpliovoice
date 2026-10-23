@@ -9,19 +9,24 @@ import {
 } from './theme-preferences';
 
 describe('theme preferences', () => {
-  it('preserves the old appearance and tolerates malformed saved preferences', () => {
+  it('preserves the old appearance, defaults to Arplio light, and tolerates malformed preferences', () => {
     expect(parseThemePreferences('{', 'light')).toEqual({
       mode: 'light',
       light: 'default',
       dark: 'default',
     });
-    expect(parseThemePreferences('{"mode":"invalid","light":"missing","dark":"current"}')).toEqual({
+    expect(parseThemePreferences('{', 'dark')).toEqual({
       mode: 'dark',
+      light: 'default',
+      dark: 'default',
+    });
+    expect(parseThemePreferences('{"mode":"invalid","light":"missing","dark":"current"}')).toEqual({
+      mode: 'light',
       light: 'default',
       dark: 'current',
     });
     expect(parseThemePreferences('null')).toEqual({
-      mode: 'dark',
+      mode: 'light',
       light: 'default',
       dark: 'default',
     });
@@ -39,7 +44,7 @@ describe('theme preferences', () => {
   });
   it('migrates previous palette names without changing the selected colors', () => {
     expect(parseThemePreferences('{"light":"t3-chat","dark":"voicestudio-classic"}')).toEqual({
-      mode: 'dark',
+      mode: 'light',
       light: 'signal',
       dark: 'heritage',
     });

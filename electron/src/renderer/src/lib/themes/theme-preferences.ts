@@ -38,9 +38,9 @@ export function parseThemePreferences(
   return {
     mode: ['light', 'dark', 'system'].includes(value.mode ?? '')
       ? value.mode!
-      : legacy === 'light'
-        ? 'light'
-        : 'dark',
+      : legacy === 'dark'
+        ? 'dark'
+        : 'light',
     light: palette(value.light),
     dark: palette(value.dark),
   };

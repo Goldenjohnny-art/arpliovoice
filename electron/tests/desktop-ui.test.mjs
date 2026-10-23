@@ -18,7 +18,7 @@ test('launch: window, title and bridge match the real OS', async (t) => {
   await withApp(t, {}, async ({ page }) => {
     await page.waitForFunction(() => Boolean(window.voicestudio?.files?.saveData));
     const facts = await bridgeFacts(page);
-    assert.match(facts.title, /VoiceStudio/);
+    assert.match(facts.title, /Arplio Voice/);
     assert.equal(facts.platform, process.platform);
     assert.equal(facts.saveData, 'function');
   });
@@ -216,8 +216,8 @@ test('settings: theme and language survive restart, user data stays in the profi
       location.hash = '#/settings/appearance';
     });
     const dark = page.getByRole('group', { name: 'Dark', exact: true });
-    // Studio is the default palette, so pick the other one to make the change observable.
-    const original = dark.getByRole('button', { name: 'VoiceStudio Original', exact: true });
+    // Arplio is the default palette, so pick the other one to make the change observable.
+    const original = dark.getByRole('button', { name: 'Signal', exact: true });
     await original.click();
     await original.and(page.locator('[aria-pressed="true"]')).waitFor();
 

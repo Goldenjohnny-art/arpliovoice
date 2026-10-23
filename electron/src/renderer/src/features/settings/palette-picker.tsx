@@ -22,10 +22,11 @@ export function PalettePicker({ appearance }: { appearance: ThemeAppearance }) {
         {options.map((option) => {
           const colors = paletteColors(option.id, appearance);
           const dark = appearance === 'dark';
-          const background = colors?.canvas ?? (dark ? '#0a0a0a' : '#fdfdfd');
-          const sidebar = colors?.sidebar ?? (dark ? '#111111' : '#fafafa');
-          const text = colors?.text ?? (dark ? '#f5f5f5' : '#27272a');
-          const accent = colors?.messageAction ?? (dark ? '#3268ef' : '#2449df');
+          // The default (Arplio) palette has no colors object; mirror t3-theme.css.
+          const background = colors?.canvas ?? (dark ? '#0a0a0a' : '#fafafa');
+          const sidebar = colors?.sidebar ?? (dark ? '#141414' : '#ffffff');
+          const text = colors?.text ?? (dark ? '#fafafa' : '#0a0a0a');
+          const accent = colors?.messageAction ?? '#6366f1';
           const selected = settings[appearance] === option.id;
           return (
             <button
