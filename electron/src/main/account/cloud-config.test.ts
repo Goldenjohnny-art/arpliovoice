@@ -27,8 +27,8 @@ it('lists exactly the origins the app may contact', () => {
   ]);
 });
 
-it('accounts are available in developer builds and hidden in packaged builds without the flag', () => {
-  expect(cloudAccountsAvailable(false)).toBe(true);
+it('upstream cloud accounts stay hidden in every build without the flag', () => {
+  expect(cloudAccountsAvailable(false)).toBe(false);
   expect(cloudAccountsAvailable(true)).toBe(false);
 });
 

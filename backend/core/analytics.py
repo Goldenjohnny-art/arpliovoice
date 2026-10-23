@@ -54,7 +54,9 @@ _OFF_VALUES = {"1", "true", "yes", "on"}
 #: desktop shell; developers can point at their own project) always wins.
 #: Committed-token guard: tests/test_no_committed_analytics_token.py allows a
 #: `phc_` literal in exactly this file and electron/src/shared/utils/analytics.ts.
-_PUBLIC_PROJECT_TOKEN = "phc_kJK9nFqtwFmB4CYWS4bMDTY7z9P4KCRyiRT7CzJTXm9f"  # gitleaks:allow — publishable write-only key (#1193)
+#: Empty: Arplio Voice ships no analytics destination, so analytics stays off
+#: (and its consent prompt hidden) unless POSTHOG_PROJECT_TOKEN supplies one.
+_PUBLIC_PROJECT_TOKEN = ""
 _DEFAULT_HOST = "https://us.i.posthog.com"
 
 #: The ONLY property keys that may leave this machine. Anything else is dropped.

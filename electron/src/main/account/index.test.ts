@@ -1,7 +1,7 @@
 import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 const h = vi.hoisted(() => ({
   packaged: false,
@@ -45,6 +45,9 @@ const opts = {
   isRemoteBackend: () => false,
   notifyBackend: vi.fn(async (_path: string) => {}),
 };
+// Arplio Voice ships upstream cloud accounts dark; these tests cover the
+// machinery as an explicit VOICESTUDIO_CLOUD_ACCOUNTS=1 build would run it.
+beforeEach(() => vi.stubGlobal('__CLOUD_ACCOUNTS__', true));
 afterEach(() => {
   h.packaged = false;
   h.safeThrows = false;
@@ -68,7 +71,7 @@ it('hands the bridge to the backend spawn only, never to process.env', async () 
 });
 
 it('starts no bridge when the build does not offer accounts', async () => {
-  h.packaged = true;
+  vi.stubGlobal('__CLOUD_ACCOUNTS__', false);
   h.dir = mkdtempSync(join(tmpdir(), 'vs-account-'));
   (await startAccount(opts))();
   expect(h.setBackendOnlyEnv).not.toHaveBeenCalled();

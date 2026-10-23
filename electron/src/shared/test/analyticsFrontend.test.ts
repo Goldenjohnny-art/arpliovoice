@@ -161,7 +161,7 @@ describe('initAnalyticsFromConsent — silence is not consent', () => {
     expect(started).toBe(false); // fails CLOSED
   });
 
-  it('starts ONLY when the user opted in and a destination exists', async () => {
+  it('never starts without a build-time destination, even when opted in', async () => {
     vi.mock('posthog-js/dist/module.slim.no-external', () => ({
       default: {
         init: vi.fn(),
@@ -176,7 +176,8 @@ describe('initAnalyticsFromConsent — silence is not consent', () => {
       available: true,
       opted_in: true,
     }));
-    expect(started).toBe(true);
+    // Arplio Voice commits no PostHog token; only VITE_POSTHOG_KEY can supply one.
+    expect(started).toBe(false);
   });
 });
 

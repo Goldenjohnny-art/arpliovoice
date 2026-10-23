@@ -1,20 +1,12 @@
-"""The analytics token lives in exactly two canonical files — nowhere else.
+"""No analytics destination token is committed anywhere.
 
-History: gitleaks once caught a hardcoded PostHog key in analytics.ts, and the
-repo banned token-shaped literals outright (build-time injection only). Owner
-reversal #1193: source builds now ship the same consent-gated analytics as
-installers, so the *publishable* project token (write-only event ingestion, not
-data access — PostHog's client keys are designed to ship in client code) is
-committed as an in-repo default in the two files that implement analytics:
-
-    backend/core/analytics.py        (_PUBLIC_PROJECT_TOKEN)
-    electron/src/shared/utils/analytics.ts  (PUBLIC_PROJECT_TOKEN)
-
-This guard pins the new contract: a `phc_` literal may exist ONLY there, both
-files must actually carry one, and the two must be the SAME token (one PostHog
-project — a drifted pair would silently split the event stream). The build-time
-override chain (env / baked secret beats the in-repo default) stays pinned
-below. Same file-scanning idiom as test_no_hardcoded_cjk / test_no_literal_borders.
+Upstream VoiceStudio committed its publishable PostHog project token in
+backend/core/analytics.py and electron/src/shared/utils/analytics.ts (#1193).
+Arplio Voice must not report its users to the upstream project, so both
+in-repo defaults are empty: analytics stays off, and its consent prompt hidden,
+unless an operator supplies an Arplio token through VITE_POSTHOG_KEY /
+POSTHOG_PROJECT_TOKEN at build or run time. This guard keeps any `phc_` literal
+out of tracked files and keeps that override chain wired.
 """
 from __future__ import annotations
 
@@ -28,11 +20,16 @@ _REPO = Path(__file__).resolve().parents[1]
 # so a key can't slip into a *different* file unnoticed.
 _POSTHOG_KEY_RE = re.compile(r"phc_[A-Za-z0-9]{20,}")
 
-# The ONLY tracked files allowed to contain a `phc_` literal (#1193).
+# The files that hold the (empty) in-repo default destination.
 _CANONICAL_TOKEN_FILES = (
     "backend/core/analytics.py",
     "electron/src/shared/utils/analytics.ts",
 )
+# Guards that must name the retired upstream token to pin its absence.
+_EXEMPT_FILES = {
+    "tests/test_no_committed_analytics_token.py",
+    "tests/test_gitleaks_allowlist.py",
+}
 
 _SKIP_DIRS = {"node_modules", ".git", "target", "dist", "build", ".venv", "zig-out"}
 _SCAN_EXT = {".ts", ".tsx", ".js", ".jsx", ".py", ".rs", ".json", ".yml", ".yaml", ".md", ".env"}
@@ -50,13 +47,10 @@ def _tracked_files():
             yield name, _REPO / p
 
 
-def test_posthog_token_literals_only_in_the_two_canonical_files():
+def test_no_posthog_token_literal_is_committed():
     offenders = []
     for name, path in _tracked_files():
-        # This guard describes the pattern it forbids, so exempt itself.
-        if name == "tests/test_no_committed_analytics_token.py":
-            continue
-        if name in _CANONICAL_TOKEN_FILES:
+        if name in _EXEMPT_FILES:
             continue
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
@@ -66,26 +60,19 @@ def test_posthog_token_literals_only_in_the_two_canonical_files():
             offenders.append(name)
 
     assert not offenders, (
-        "A PostHog token literal is committed outside the canonical files ("
-        + ", ".join(_CANONICAL_TOKEN_FILES)
-        + "): "
+        "A PostHog token literal is committed: "
         + ", ".join(offenders)
-        + ". The in-repo default lives ONLY there (#1193); everything else takes "
-        "the token via VITE_POSTHOG_KEY / POSTHOG_PROJECT_TOKEN at build/run time."
+        + ". Arplio Voice ships no analytics destination; supply one via "
+        "VITE_POSTHOG_KEY / POSTHOG_PROJECT_TOKEN at build/run time."
     )
 
 
-def test_both_canonical_files_carry_the_same_default_token():
-    """#1193's whole point: source builds have a destination. Both halves must
-    ship the in-repo default, and it must be ONE token — a mismatched pair would
-    split installs across PostHog projects with no error anywhere."""
-    tokens = {}
-    for name in _CANONICAL_TOKEN_FILES:
-        found = _POSTHOG_KEY_RE.findall((_REPO / name).read_text(encoding="utf-8"))
-        assert found, f"{name} no longer carries the in-repo default token (#1193)"
-        assert len(set(found)) == 1, f"{name} contains multiple distinct phc_ literals"
-        tokens[name] = found[0]
-    assert len(set(tokens.values())) == 1, f"canonical token files disagree: {tokens}"
+def test_both_in_repo_default_tokens_are_empty():
+    """An empty default keeps analytics off and the consent prompt hidden."""
+    backend = (_REPO / _CANONICAL_TOKEN_FILES[0]).read_text(encoding="utf-8")
+    frontend = (_REPO / _CANONICAL_TOKEN_FILES[1]).read_text(encoding="utf-8")
+    assert re.search(r'(?m)^_PUBLIC_PROJECT_TOKEN = ""$', backend)
+    assert re.search(r"(?m)^const PUBLIC_PROJECT_TOKEN = '';$", frontend)
 
 
 # ── the OVERRIDE chain must stay wired ───────────────────────────────────────

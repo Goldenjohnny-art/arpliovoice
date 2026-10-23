@@ -41,7 +41,8 @@ import { scrubText } from './scrub';
  * tests/test_no_committed_analytics_token.py pins that a `phc_` literal may
  * live in exactly this file and backend/core/analytics.py.
  */
-const PUBLIC_PROJECT_TOKEN = 'phc_kJK9nFqtwFmB4CYWS4bMDTY7z9P4KCRyiRT7CzJTXm9f'; // gitleaks:allow — publishable write-only key (#1193)
+// Empty: Arplio Voice ships no analytics destination unless VITE_POSTHOG_KEY sets one.
+const PUBLIC_PROJECT_TOKEN = '';
 const POSTHOG_TOKEN: string = (import.meta.env?.VITE_POSTHOG_KEY as string) || PUBLIC_PROJECT_TOKEN;
 const POSTHOG_HOST: string =
   (import.meta.env?.VITE_POSTHOG_HOST as string) || 'https://us.i.posthog.com';

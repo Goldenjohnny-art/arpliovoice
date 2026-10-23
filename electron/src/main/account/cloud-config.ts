@@ -52,9 +52,9 @@ export function cloudOrigins(env: CloudEnvironment): Set<string> {
 }
 
 /**
- * On in developer builds; packaged builds need VOICESTUDIO_CLOUD_ACCOUNTS=1 at build
- * time, so releases ship it dark until the vssaas production API launches.
+ * VoiceStudio Cloud is the upstream project's service, so Arplio Voice never
+ * offers it; only an explicit VOICESTUDIO_CLOUD_ACCOUNTS=1 build turns it on.
  */
-export function cloudAccountsAvailable(packaged: boolean): boolean {
-  return !packaged || (typeof __CLOUD_ACCOUNTS__ === 'boolean' && __CLOUD_ACCOUNTS__);
+export function cloudAccountsAvailable(_packaged: boolean): boolean {
+  return typeof __CLOUD_ACCOUNTS__ === 'boolean' && __CLOUD_ACCOUNTS__;
 }
