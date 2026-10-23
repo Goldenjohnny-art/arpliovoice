@@ -25,6 +25,7 @@ import { getBridge } from '@/components/bridge';
 import { apiJson, describeError } from '@/lib/api/client';
 import type { SystemInfo } from '@/lib/api/types';
 import { brandIcon } from '@/lib/brand';
+import { PRODUCT_NAME } from '@shared/app-config';
 import { SettingsActionError } from './settings-action-error';
 import { ModelCredits } from './model-credits';
 import { SettingsRow, SettingsSection } from './settings-layout';
@@ -71,7 +72,7 @@ const FIX_ROUTES: Record<string, string> = {
 function reportText(report: DiagnosticReport) {
   const marker: Record<CheckStatus, string> = { ok: '[ OK ]', warn: '[WARN]', fail: '[FAIL]' };
   const lines = [
-    `VoiceStudio diagnostics - v${report.app_version} on ${report.platform}`,
+    `${PRODUCT_NAME} diagnostics - v${report.app_version} on ${report.platform}`,
     '',
     ...report.checks.flatMap((check) => [
       `${marker[check.status]} ${check.label}: ${check.detail}`,
@@ -156,10 +157,14 @@ export function DiagnosticsSettings() {
   return (
     <>
       <SettingsSection icon={InfoIcon} title={t('about.title')}>
-        <SettingsRow id="diagnostics-app" title={t('about.app')}>
+        <SettingsRow
+          id="diagnostics-app"
+          title={t('about.app')}
+          description={t('brand.attribution')}
+        >
           <span className="inline-flex items-center gap-2 text-sm font-medium" translate="no">
             <img src={brandIcon} alt="" className="size-5" />
-            VoiceStudio
+            {PRODUCT_NAME}
           </span>
         </SettingsRow>
         <SettingsRow id="diagnostics-version" title={t('about.version')}>

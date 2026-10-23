@@ -2,7 +2,6 @@ import { HomeFeatureIcon } from './home-feature-icon';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getBridge } from '@/components/bridge';
 import { runRendererTask } from '@/lib/global-error-recovery';
-import { HomeContributors } from './home-contributors';
 import './home-page.css';
 import { WorkspaceHeader } from '@/components/app-shell/workspace-header';
 import { ProfileAvatar } from '@/components/profile-avatar';
@@ -32,6 +31,7 @@ import {
   FolderOpenIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { WEBSITE_URL } from '@shared/app-config';
 
 interface Destination {
   to: string;
@@ -120,16 +120,6 @@ export function HomePage() {
       label: t('nav.transcribe'),
       description: t('homeUi.transcribe'),
     },
-    {
-      to: '/calls',
-      label: t('workflows.title'),
-      description: t('workflows.description'),
-    },
-    {
-      to: '/tools',
-      label: t('tools.title'),
-      description: t('tools.desc'),
-    },
   ];
   const recentProjects = [
     ...dubProjects.map((project) => ({
@@ -215,7 +205,7 @@ export function HomePage() {
                       <TooltipTrigger
                         render={
                           <a
-                            href="https://voicestudio.sh"
+                            href={WEBSITE_URL}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="rounded-md transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
@@ -225,7 +215,7 @@ export function HomePage() {
                               event.preventDefault();
                               event.currentTarget.focus();
                               runRendererTask('Preview official website', () =>
-                                browser.open('https://voicestudio.sh'),
+                                browser.open(WEBSITE_URL),
                               );
                             }}
                           />
@@ -242,7 +232,6 @@ export function HomePage() {
                     {t('homeUi.subtitle')}
                   </p>
                 </div>
-                <HomeContributors />
               </div>
             </div>
             {[destinations.slice(0, 3), destinations.slice(3)].map((group, groupIndex) => (

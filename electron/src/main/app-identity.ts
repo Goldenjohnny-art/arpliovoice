@@ -1,11 +1,22 @@
+import { join } from 'node:path';
 import type { AboutPanelOptionsOptions, App, MenuItemConstructorOptions } from 'electron';
 import { PRODUCT_NAME } from '../../../config/app-config.mjs';
 
 export const DESKTOP_APP_NAME = PRODUCT_NAME;
 
-/** Set before Electron creates the native application menu. */
-export function installAppIdentity(application: Pick<App, 'setName'>): void {
+/**
+ * Electron's userData folder name from before the Arplio Voice rename. It holds
+ * the Python runtime, runtime preferences and crash journals, so it stays fixed
+ * while the visible product name changes; renaming it orphans that state.
+ */
+export const USER_DATA_DIR_NAME = 'VoiceStudio';
+
+/** Set before Electron creates the native application menu or reads userData. */
+export function installAppIdentity(
+  application: Pick<App, 'setName' | 'getPath' | 'setPath'>,
+): void {
   application.setName(DESKTOP_APP_NAME);
+  application.setPath('userData', join(application.getPath('appData'), USER_DATA_DIR_NAME));
 }
 
 export function createMacApplicationMenuTemplate(): MenuItemConstructorOptions[] {

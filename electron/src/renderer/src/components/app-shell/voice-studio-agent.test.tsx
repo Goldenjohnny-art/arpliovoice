@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { VoiceStudioAgent } from './voice-studio-agent';
 import { agentConversation, receiveAgentEvent } from '@/lib/agent-conversation';
+import { openRepairAgent } from '@/lib/repair-agent-events';
 const mocks = vi.hoisted(() => ({
   repair: {
     list: vi.fn(),
@@ -45,9 +46,13 @@ beforeEach(() => {
   mocks.repair.start.mockResolvedValue({ sessionId: 'one' });
 });
 afterEach(cleanup);
+it('shows no always-on assistant button until a recovery action opens it', () => {
+  render(<VoiceStudioAgent />);
+  expect(screen.queryByRole('button', { name: 'repairAgent.title' })).not.toBeInTheDocument();
+});
 async function open() {
   render(<VoiceStudioAgent />);
-  fireEvent.click(screen.getByRole('button', { name: 'repairAgent.title' }));
+  act(() => openRepairAgent());
   await screen.findByRole('button', { name: 'Codex' });
 }
 it('runs a feature preset without a checkout and keeps the reply for follow-up chat', async () => {
@@ -70,7 +75,7 @@ it('runs a feature preset without a checkout and keeps the reply for follow-up c
   });
   expect(screen.getByText('Created book-123')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'common.close' }));
-  fireEvent.click(screen.getByRole('button', { name: 'repairAgent.title' }));
+  act(() => openRepairAgent());
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Render that preview' } });
   fireEvent.click(screen.getByRole('button', { name: 'agentWorkspace.send' }));
   await waitFor(() => expect(mocks.repair.start).toHaveBeenCalledTimes(2));
@@ -117,7 +122,6 @@ it('requires an attached checkout only for explicitly selected source repair', a
   );
 });
 
-
 it.each([
   ['Renderer crashed unexpectedly', 'source'],
   ['ACTION_REQUEST: Restart the backend', 'app'],
@@ -125,15 +129,16 @@ it.each([
   const { DEFAULT_REPAIR_AGENT_KEY, openRepairAgent } = await import('@/lib/repair-agent-events');
   localStorage.setItem(DEFAULT_REPAIR_AGENT_KEY, 'codex');
   mocks.repair.getState.mockResolvedValue({
-    status: 'idle', output: '', workspaceAvailable: workspace === 'source',
+    status: 'idle',
+    output: '',
+    workspaceAvailable: workspace === 'source',
   });
   render(<VoiceStudioAgent />);
   act(() => openRepairAgent(report, true));
-  await waitFor(() => expect(mocks.repair.start).toHaveBeenCalledWith(
-    expect.objectContaining({ workspace, report }),
-  ));
+  await waitFor(() =>
+    expect(mocks.repair.start).toHaveBeenCalledWith(expect.objectContaining({ workspace, report })),
+  );
 });
-
 
 it('keeps crash repair ready for Send until a source checkout is attached', async () => {
   const { DEFAULT_REPAIR_AGENT_KEY, openRepairAgent } = await import('@/lib/repair-agent-events');
@@ -145,14 +150,21 @@ it('keeps crash repair ready for Send until a source checkout is attached', asyn
   expect(screen.getByRole('button', { name: 'agentWorkspace.send' })).toBeDisabled();
   fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
   expect(mocks.repair.start).not.toHaveBeenCalled();
-  mocks.repair.chooseWorkspace.mockResolvedValue({ workspaceAvailable: true, workspacePath: '/source' });
+  mocks.repair.chooseWorkspace.mockResolvedValue({
+    workspaceAvailable: true,
+    workspacePath: '/source',
+  });
   fireEvent.click(choose);
-  await waitFor(() => expect(screen.getByRole('button', { name: 'agentWorkspace.send' })).toBeEnabled());
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'agentWorkspace.send' })).toBeEnabled(),
+  );
   expect(mocks.repair.start).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button', { name: 'agentWorkspace.send' }));
-  await waitFor(() => expect(mocks.repair.start).toHaveBeenCalledWith(
-    expect.objectContaining({ workspace: 'source', report: 'Renderer crashed unexpectedly' }),
-  ));
+  await waitFor(() =>
+    expect(mocks.repair.start).toHaveBeenCalledWith(
+      expect.objectContaining({ workspace: 'source', report: 'Renderer crashed unexpectedly' }),
+    ),
+  );
 });
 it('keeps the newest CLI scan when an older one answers last', async () => {
   let answerMount!: (agents: unknown) => void;
@@ -167,7 +179,7 @@ it('keeps the newest CLI scan when an older one answers last', async () => {
         }),
   );
   render(<VoiceStudioAgent />);
-  fireEvent.click(screen.getByRole('button', { name: 'repairAgent.title' }));
+  act(() => openRepairAgent());
   await waitFor(() => expect(screen.getByRole('button', { name: 'Claude Code' })).toBeEnabled());
   // The mount scan started first but answers after the refresh: it is stale.
   await act(async () => {

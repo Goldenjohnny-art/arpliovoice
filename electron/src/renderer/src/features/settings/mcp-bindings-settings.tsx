@@ -19,6 +19,7 @@ import { apiFetch, apiJson, describeError } from '@/lib/api/client';
 import { isImeComposing } from '@/lib/ime';
 import { SettingsActionError } from './settings-action-error';
 import { SettingsRow, SettingsSection } from './settings-layout';
+import { REPOSITORY_URL } from '@shared/app-config';
 
 interface McpBinding {
   client_id: string;
@@ -28,7 +29,7 @@ interface McpBinding {
 }
 
 const DEFAULT_PROFILE = '__default__';
-const MCP_DOCS_URL = 'https://github.com/debpalash/VoiceStudio/blob/main/docs/mcp.md';
+const MCP_DOCS_URL = `${REPOSITORY_URL}/blob/main/docs/mcp.md`;
 
 export function McpBindingsSettings() {
   const { t } = useTranslation();

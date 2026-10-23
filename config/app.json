@@ -1,6 +1,8 @@
 {
-  "productName": "VoiceStudio",
+  "productName": "Arplio Voice",
   "appId": "com.voicestudio.desktop",
+  "website": "https://arplio.com",
+  "repository": "https://github.com/Goldenjohnny-art/arpliovoice",
   "ports": {
     "backend": 3900,
     "web": 3901,

@@ -29,10 +29,10 @@ def test_current_version_is_in_lockstep_everywhere() -> None:
         assert match and match.group(1) == CURRENT_VERSION, path
 
 
-def test_visible_brand_surfaces_say_voicestudio() -> None:
+def test_visible_brand_surfaces_say_arplio_voice() -> None:
     visible_files = ("electron/build/Info.plist", "electron/src/renderer/index.html")
     product_name = json.loads((ROOT / "config/app.json").read_text())["productName"]
-    assert product_name == "VoiceStudio"
+    assert product_name == "Arplio Voice"
     for path in visible_files:
         text = (ROOT / path).read_text()
         assert "__APP_PRODUCT_NAME__" in text, path
@@ -40,31 +40,25 @@ def test_visible_brand_surfaces_say_voicestudio() -> None:
         assert "OmniVoice may" not in text, path
         assert "OmniVoice Gallery" not in text, path
 
-    readme = (ROOT / "README.md").read_text()
-    assert "**VoiceStudio** (default, powered by k2-fsa/OmniVoice)" in readme
-    assert "**OmniVoice** (default)" not in readme
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "<h1>Arplio Voice</h1>" in readme
+    # AGPL attribution to the upstream work stays visible.
+    assert "VoiceStudio](https://github.com/debpalash/VoiceStudio) by\nPalash Debnath" in readme
 
 
-def test_brand_mark_is_shared_and_fills_the_icon() -> None:
-    mark = (ROOT / "electron/src/shared/components/brand/VoiceStudioMark.jsx").read_text()
-    header = (ROOT / "electron/src/shared/components/Header.jsx").read_text()
-    about = (ROOT / "electron/src/shared/components/settings/AboutTab.jsx").read_text()
-    logo = (ROOT / "docs/logo.svg").read_text()
-    favicon = (ROOT / "electron/public/favicon.svg").read_text()
-
-    signature = "M6 34c4 0 5-7 9-7"
-    assert signature in mark
-    assert signature in logo
-    assert signature in favicon
-    assert "<VoiceStudioMark" in header
-    assert "<VoiceStudioMark" in about
-    assert 'data-testid="voice-studio-logo"' in header
-
-    # The previous icon devoted most of its canvas to an empty ring. The new
-    # mark uses the full tile and keeps only a narrow 2-unit outer margin.
-    assert 'x="2" y="2" width="60" height="60"' in logo
-    assert "<circle" not in logo
-    assert 'src="docs/logo.png"' in (ROOT / "README.md").read_text()
+def test_arplio_mark_is_the_app_icon_everywhere() -> None:
+    """One source logo (branding/logo.png) feeds the in-app mark, the favicon
+    and the packaged icons; none of them may fall back to the upstream mark."""
+    assert (ROOT / "branding/logo.png").is_file()
+    brand = (ROOT / "electron/src/renderer/src/lib/brand.ts").read_text()
+    assert "public/brand-mark.png" in brand
+    html = (ROOT / "electron/src/renderer/index.html").read_text()
+    assert 'href="/favicon.png"' in html
+    assert not (ROOT / "electron/public/favicon.svg").exists()
+    for name in ("brand-mark.png", "favicon.png"):
+        assert (ROOT / "electron/public" / name).is_file(), name
+    for name in ("icon.png", "icon.ico", "icon.icns", "32x32.png"):
+        assert (ROOT / "electron/build/icons" / name).is_file(), name
 
 
 def test_python_package_metadata_points_to_voicestudio() -> None:

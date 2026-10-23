@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import {
   createMacApplicationMenuTemplate,
@@ -10,17 +10,26 @@ import {
 describe('installAppIdentity', () => {
   it('names Electron internals consistently', () => {
     const setName = vi.fn();
+    const setPath = vi.fn();
 
-    installAppIdentity({ setName });
+    installAppIdentity({ setName, setPath, getPath: () => '/app-data' });
 
     expect(setName).toHaveBeenCalledOnce();
-    expect(setName).toHaveBeenCalledWith('VoiceStudio');
+    expect(setName).toHaveBeenCalledWith('Arplio Voice');
   });
 
-  it('defines the complete native macOS menu with VoiceStudio app labels', () => {
+  it('keeps userData in the pre-rename folder so the runtime is not orphaned', () => {
+    const setPath = vi.fn();
+
+    installAppIdentity({ setName: vi.fn(), setPath, getPath: () => '/app-data' });
+
+    expect(setPath).toHaveBeenCalledWith('userData', join('/app-data', 'VoiceStudio'));
+  });
+
+  it('defines the complete native macOS menu with Arplio Voice app labels', () => {
     const template = createMacApplicationMenuTemplate();
 
-    expect(template[0]).toMatchObject({ label: 'VoiceStudio' });
+    expect(template[0]).toMatchObject({ label: 'Arplio Voice' });
     expect(template[0]?.submenu).toEqual(
       expect.arrayContaining([{ role: 'about' }, { role: 'hide' }, { role: 'quit' }]),
     );
@@ -54,7 +63,7 @@ describe('installAppIdentity', () => {
     installMacApplicationMenu(application, menu, '0.5.6');
 
     expect(application.setAboutPanelOptions).toHaveBeenCalledWith({
-      applicationName: 'VoiceStudio',
+      applicationName: 'Arplio Voice',
       applicationVersion: '0.5.6',
       version: '0.5.6',
     });

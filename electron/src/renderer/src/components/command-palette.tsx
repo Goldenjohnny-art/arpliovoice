@@ -26,13 +26,11 @@ import {
   LayersIcon,
   LibraryIcon,
   MicIcon,
-  PhoneCallIcon,
   PlayIcon,
   SettingsIcon,
   KeyboardIcon,
   UsersRoundIcon,
   WandSparklesIcon,
-  WrenchIcon,
   XIcon,
   type LucideIcon,
 } from 'lucide-react';
@@ -164,13 +162,6 @@ export function CommandPalette() {
       run: () => navigate({ to: '/transcriptions' }),
     },
     {
-      id: 'calls',
-      label: t('workflows.title'),
-      group: workspaceGroup,
-      icon: PhoneCallIcon,
-      run: () => navigate({ to: '/calls' }),
-    },
-    {
       id: 'design',
       label: t('designWorkspace.title'),
       group: workspaceGroup,
@@ -190,13 +181,6 @@ export function CommandPalette() {
       group: workspaceGroup,
       icon: FolderIcon,
       run: () => navigate({ to: '/projects' }),
-    },
-    {
-      id: 'tools',
-      label: t('tools.title'),
-      group: workspaceGroup,
-      icon: WrenchIcon,
-      run: () => navigate({ to: '/tools' }),
     },
     {
       id: 'shortcuts',

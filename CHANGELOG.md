@@ -1,6 +1,7 @@
 # Changelog
 
-All notable changes to VoiceStudio.
+All notable changes to Arplio Voice (a fork of VoiceStudio; entries before the
+rebrand describe upstream VoiceStudio).
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 `package.json` is the maintained app-version source of truth; Electron package
@@ -10,9 +11,22 @@ metadata and the backend fallback mirror it.
 
 **Highlights**
 
+- VoiceStudio is now Arplio Voice, with the Arplio look: Inter and JetBrains Mono, indigo accents, light mode by default
+- A simpler workspace focused on cloning, design, dubbing, transcription and audiobooks
+- No upstream promotion or telemetry: the star badge, sponsor footer, Pro page and upstream analytics are gone
 - Preview iOS and Android companion apps for your own VoiceStudio
 
+### Changed
+
+- Renamed the app to Arplio Voice with the Arplio logo, colors and fonts; light mode is the default
+- Workflows/Calls, Tools, Integrations and Settings → Support, Sharing and OpenAPI are no longer in the app
+- The floating assistant button is gone; recovery buttons still open it when setup needs repair
+- Updates, bug reports and help links now point at the Arplio Voice repository
+- Analytics ships with no destination and VoiceStudio Cloud sign-in is off, so the app sends no usage data anywhere
+
 ### Added
+
+- Settings → Source code link and an About credit to VoiceStudio, as the AGPL-3.0 requires
 
 - Preview iOS and Android companion apps: drive your own VoiceStudio from your phone (speak, voices and cloning, dubbing, dictation) after pairing by QR code; build from source for now ([guide](docs/mobile.md)) (#2965)
 - Smart Fit speed limits: set the fastest and slowest speed dubbing may apply to a line, from the Timing section (#3026) — thanks @MoonDragon-MD!
@@ -40,6 +54,8 @@ metadata and the backend fallback mirror it.
 - The installed app now rebuilds a Python environment that antivirus or disk cleanup removed, once per launch with the usual setup progress, instead of stopping at a setup error; your voices and projects are untouched (#3032) — thanks @afraniohugo and @javalovelinux-cmd!
 
 ### Docs
+
+- New Arplio Voice README; the upstream Chinese and Japanese READMEs were removed
 
 - OmniVoice GGUF docs state that the installers do not ship its native binary yet (#3026) — thanks @DestinyQJY!
 - Contributor guides and the pull request template explain how to sign the CLA before opening a first pull request (#2676)

@@ -41,6 +41,8 @@ _REF_REQUIRED_SECTIONS = {"Added", "Fixed"}
 # work with no issue or PR to point at). Match is by substring; keep this list
 # short and delete entries once they ship in a tagged release.
 _REF_ALLOWLIST = (
+    # owner-directed Arplio Voice rebrand (2026-10-23), no issue
+    "Settings → Source code link and an About credit to VoiceStudio",
     # owner commit 7036e101 — first-run consent prompt, committed straight to main
     "First-run consent question for the existing opt-in analytics",
     # owner commits ce842737 + dc766baf — Colab notebook, committed straight to main

@@ -4,11 +4,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_readme_installs_skills_from_the_canonical_repository() -> None:
+def test_readme_does_not_advertise_upstream_agent_skills() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
-    assert "npx skills add debpalash/VoiceStudio" in readme
-    assert "npx skills add debpalash/omnivoice-studio" not in readme
+    assert "npx skills add debpalash/" not in readme
 
 
 def test_public_skill_surfaces_use_current_identity_and_license() -> None:

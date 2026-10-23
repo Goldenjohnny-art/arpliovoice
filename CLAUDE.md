@@ -1,3 +1,36 @@
+## Arplio Voice fork (owner-set 2026-10-23; overrides conflicting upstream rules below)
+
+This repository is **Arplio Voice**, a rebranded AGPL-3.0 fork of VoiceStudio
+(© Palash Debnath and VoiceStudio contributors) for the Arplio Studio module of
+arplio.com. Where a rule below came from the upstream owner and conflicts with
+this section, this section wins.
+
+- **Brand layer:** `config/app.json` holds the visible name (`Arplio Voice`), the
+  website and the public source repository; code reads them through
+  `config/app-config.mjs` / `@shared/app-config`, never as literals. The logo
+  source is `branding/logo.png`; app icons, `electron/public/brand-mark.png` and
+  `favicon.png` are generated from it.
+- **Design:** Arplio design system: Inter + JetBrains Mono, canvas `#fafafa`,
+  ink `#0a0a0a`, brand indigo `#6366f1`, slate muted text, 12px control radius,
+  light mode by default. Tokens live in `electron/src/renderer/src/styles/`.
+- **Keep internal identities:** the `OmniVoice` data directories, `omnivoice.db`,
+  `OMNIVOICE_*` / `VOICESTUDIO_*` env vars, the `omnivoice` Python package, the
+  `com.voicestudio.desktop` app id (native helper, store, OS permissions) and the
+  Electron userData folder `VoiceStudio` stay unchanged. Renaming them orphans
+  user data or breaks native integrations.
+- **No upstream phone-home:** no upstream analytics token (both in-repo
+  defaults stay empty), no VoiceStudio Cloud accounts, no GitHub star badge,
+  sponsor footer, contributor credits, upstream Pro page or Discord links.
+  Updates, bug reports and docs links point at the fork repository.
+- **AGPL obligations:** keep the visible attribution (`brand.attribution`) and
+  the Settings "Source code" link to the public fork, and publish every hosted
+  change there.
+- **Cut from the UI:** Workflows/Calls, Tools, Integrations, Settings → Support,
+  Sharing and OpenAPI, and the always-on assistant button. Backend code stays;
+  a hosted deployment must not expose those endpoints publicly.
+- **Paid use:** the default OmniVoice weights and NLLB are CC-BY-NC. Anything
+  sold must default to commercially licensed engines (Apache/MIT).
+
 ## Active desktop: Electron only
 
 Electron (`electron/`) is the only desktop and web UI. The Tauri shell and legacy

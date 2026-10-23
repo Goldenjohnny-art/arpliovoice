@@ -5,4 +5,6 @@ export {
   DEFAULT_ELECTRON_PROXY_PORT,
   DEFAULT_WEB_PORT,
   PRODUCT_NAME,
+  REPOSITORY_URL,
+  WEBSITE_URL,
 } from '../../../config/app-config.mjs';

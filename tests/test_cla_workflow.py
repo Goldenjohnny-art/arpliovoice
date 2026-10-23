@@ -72,7 +72,7 @@ def test_new_contributors_are_told_to_sign_before_their_first_pull_request():
     assert contributing.count(signing_issue) >= 2
     assert signing_issue in template
     assert "sign the Contributor License Agreement once" in " ".join(template.split())
-    assert "contribution-licensing" in readme
+    assert "VoiceStudio" in readme  # the fork README credits upstream instead of hosting CLA steps
     assert cla.SIGNING_LABEL == "cla"
 
 

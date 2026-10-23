@@ -6,7 +6,6 @@ import {
   FingerprintIcon,
   BookOpenIcon,
   FolderIcon,
-  WrenchIcon,
   LayersIcon,
   LibraryIcon,
   FilmIcon,
@@ -14,8 +13,6 @@ import {
   MicIcon,
   UsersRoundIcon,
   ChevronRightIcon,
-  BlocksIcon,
-  WorkflowIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -29,15 +26,12 @@ type Destination = readonly [
     | '/stories'
     | '/audiobook'
     | '/projects'
-    | '/tools'
     | '/batch'
     | '/gallery'
     | '/dub'
     | '/design'
     | '/transcriptions'
-    | '/personas'
-    | '/calls'
-    | '/integrations',
+    | '/personas',
   label: string,
   icon: typeof AudioLinesIcon,
   activate?: () => void,
@@ -61,10 +55,7 @@ const dubDestinations: Destination[] = [
 ];
 const laterDestinations: Destination[] = [
   ['/transcriptions', 'nav.transcribe', MicIcon],
-  ['/calls', 'workflows.title', WorkflowIcon],
   ['/projects', 'projects.title', FolderIcon],
-  ['/tools', 'tools.title', WrenchIcon],
-  ['/integrations', 'integrationCatalog.title', BlocksIcon],
 ];
 
 const itemClass =
@@ -82,10 +73,7 @@ const iconMotion: Record<Destination[0], string> = {
   '/dub': 'tilt',
   '/batch': 'lift',
   '/transcriptions': 'nudge',
-  '/calls': 'pulse',
   '/projects': 'lift',
-  '/tools': 'tilt',
-  '/integrations': 'turn',
 };
 
 function NavigationLink({

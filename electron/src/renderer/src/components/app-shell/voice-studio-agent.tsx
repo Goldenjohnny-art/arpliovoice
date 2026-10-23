@@ -1,6 +1,5 @@
 import { useStore } from '@tanstack/react-store';
 import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useRouterState } from '@tanstack/react-router';
 import {
   ArrowUpIcon,
@@ -246,21 +245,9 @@ export function VoiceStudioAgent() {
   }
   if (!bridge) return null;
   if (!open && !running && translation.runs.length) return <TranslationAgentDock />;
-  if (!open)
-    return createPortal(
-      <Button
-        size="icon"
-        variant="secondary"
-        aria-label={t('repairAgent.title')}
-        title={t('repairAgent.title')}
-        onClick={() => setOpen(true)}
-        className="fixed right-3 top-1/2 z-40 size-11 -translate-y-1/2 rounded-full border border-sidebar-border bg-sidebar text-sidebar-foreground shadow-lg"
-      >
-        <BotIcon />
-        {running && <span className="absolute right-1 top-1 size-2 rounded-full bg-primary" />}
-      </Button>,
-      document.body,
-    );
+  // Arplio Voice keeps no always-on assistant button; the dock opens only from
+  // an explicit recovery action (agent fix buttons) or for translation runs.
+  if (!open) return null;
 
   return (
     <AgentDockFrame

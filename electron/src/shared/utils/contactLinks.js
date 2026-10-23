@@ -1,11 +1,13 @@
-export const REPO_URL = 'https://github.com/debpalash/VoiceStudio';
+import { REPOSITORY_URL, WEBSITE_URL as PRODUCT_WEBSITE_URL } from '../app-config';
+
+export const REPO_URL = REPOSITORY_URL;
 export const ISSUES_URL = `${REPO_URL}/issues`;
 export const DISCORD_URL = 'https://discord.gg/bzQavDfVV9';
 // GitHub Security Advisories = the private "report a vulnerability" flow that
 // SECURITY.md points at (never a public issue for security bugs).
 export const SECURITY_URL = `${REPO_URL}/security/advisories/new`;
 export const EMAIL = 'hi@voicestudio.sh';
-export const WEBSITE_URL = 'https://palash.dev';
+export const WEBSITE_URL = PRODUCT_WEBSITE_URL;
 export const X_URL = 'https://x.com/idebpalash';
 
 export const LICENSE_EMAIL = 'hi@voicestudio.sh';

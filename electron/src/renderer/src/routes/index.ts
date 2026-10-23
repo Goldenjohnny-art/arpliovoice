@@ -28,24 +28,10 @@ const ProjectsPage = lazyRouteComponent(
   () => import('@/features/projects/projects-page'),
   'ProjectsPage',
 );
-const CallsPage = lazyRouteComponent(
-  () => import('@/features/workflows/workflows-page'),
-  'WorkflowsPage',
-);
-const ToolsPage = lazyRouteComponent(() => import('@/features/tools/tools-page'), 'ToolsPage');
-const IntegrationsPage = lazyRouteComponent(
-  () => import('@/features/integrations/integrations-page'),
-  'IntegrationsPage',
-);
-const IntegrationDetailPage = lazyRouteComponent(
-  () => import('@/features/integrations/integration-detail-page'),
-  'IntegrationDetailPage',
-);
 const SettingsPage = lazyRouteComponent(
   () => import('@/features/settings/settings-page'),
   'SettingsPage',
 );
-const ProPage = lazyRouteComponent(() => import('@/features/pro/pro-page'), 'ProPage');
 
 export const rootRoute = createRootRoute({ component: AppShell });
 
@@ -143,26 +129,6 @@ export const batchRoute = createRoute({
   path: '/batch',
   component: BatchPage,
 });
-export const callsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/calls',
-  component: CallsPage,
-});
-export const toolsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/tools',
-  component: ToolsPage,
-});
-export const integrationsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/integrations',
-  component: IntegrationsPage,
-});
-export const integrationDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/integrations/$slug',
-  component: IntegrationDetailPage,
-});
 export const mediaRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings/media',
@@ -191,11 +157,6 @@ export const audiobookRoute = createRoute({
 export const networkRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings/network',
-  component: SettingsPage,
-});
-export const sharingRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/settings/sharing',
   component: SettingsPage,
 });
 export const credentialsRoute = createRoute({
@@ -233,30 +194,9 @@ export const storageRoute = createRoute({
   path: '/settings/storage',
   component: SettingsPage,
 });
-export const supportRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/settings/support',
-  validateSearch: (search: Record<string, unknown>): { compare?: boolean } => ({
-    compare: search.compare === true || search.compare === 'true' ? true : undefined,
-  }),
-  beforeLoad: ({ search }) => {
-    if (search.compare) throw redirect({ to: '/pro' });
-  },
-  component: SettingsPage,
-});
-export const proRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/pro',
-  component: ProPage,
-});
 export const updatesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings/updates',
-  component: SettingsPage,
-});
-export const openApiRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/settings/openapi',
   component: SettingsPage,
 });
 export const diagnosticsRoute = createRoute({
@@ -266,10 +206,7 @@ export const diagnosticsRoute = createRoute({
 });
 export const routeTree = rootRoute.addChildren([
   diagnosticsRoute,
-  openApiRoute,
   updatesRoute,
-  supportRoute,
-  proRoute,
   storageRoute,
   privacyRoute,
   accountRoute,
@@ -277,7 +214,6 @@ export const routeTree = rootRoute.addChildren([
   performanceRoute,
   usageRoute,
   networkRoute,
-  sharingRoute,
   credentialsRoute,
   storiesRoute,
   audiobookRoute,
@@ -287,10 +223,6 @@ export const routeTree = rootRoute.addChildren([
   savedVoicesRoute,
   pronunciationRoute,
   mediaRoute,
-  toolsRoute,
-  callsRoute,
-  integrationsRoute,
-  integrationDetailRoute,
   batchRoute,
   galleryRoute,
   logsRoute,

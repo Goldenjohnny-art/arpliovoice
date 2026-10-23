@@ -1,4 +1,3 @@
-import { SupportSettings } from './support-settings';
 import { UpdateSettings } from './update-settings';
 import { MirrorSettings } from './mirror-settings';
 import { StorageSettings } from './storage-settings';
@@ -8,13 +7,11 @@ import { useAccount } from '@/features/account/use-account';
 import { PerformanceSettings } from './performance-settings';
 import { CredentialSettings } from './credential-settings';
 import { NetworkSettings } from './network-settings';
-import { SharingSettings } from './sharing-settings';
 import { MediaTools } from './media-tools';
 import { LogSettings } from './log-settings';
 import { PronunciationSettings } from './pronunciation-settings';
 import { PermissionsSettings } from './permissions-settings';
 import { UsageSettings } from './usage-settings';
-import { OpenApiSettings } from './openapi-settings';
 import { DiagnosticsSettings } from './diagnostics-settings';
 import { ModelSettings } from './model-settings';
 import { familyIcons, modelFamilies } from './model-family';
@@ -22,10 +19,8 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { runRendererTask } from '@/lib/global-error-recovery';
 import {
   ArrowLeftIcon,
-  ExternalLinkIcon,
   SettingsIcon,
   WifiIcon,
-  Share2Icon,
   CpuIcon,
   ShieldCheckIcon,
   UserRoundIcon,
@@ -47,9 +42,8 @@ import {
   SpellCheckIcon,
   LockKeyholeIcon,
   BarChart3Icon,
-  BracesIcon,
   StethoscopeIcon,
-  HeartHandshakeIcon,
+  CodeIcon,
   ClipboardCheckIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -67,7 +61,8 @@ import {
 import { PalettePicker } from './palette-picker';
 import { useTheme } from '@/hooks/use-theme';
 import { appearanceScales, useAppearance } from '@/hooks/use-appearance';
-import { isMac } from '@/components/bridge';
+import { getBridge, isMac } from '@/components/bridge';
+import { REPOSITORY_URL } from '@shared/app-config';
 import { cn } from '@/lib/utils';
 import { SettingsContent, SettingsRow, SettingsSection } from './settings-layout';
 import i18n, { APP_LANGUAGE_ITEMS, APP_LANGUAGES, setAppLanguage, type AppLocale } from '@/i18n';
@@ -116,30 +111,11 @@ const extraSettings = [
     fields: ['updates.tab', 'updates.check_now'],
   },
   {
-    to: '/settings/support',
-    label: 'donate.title',
-    Icon: ExternalLinkIcon,
-    Component: SupportSettings,
-    fields: ['donate.title', 'contact.channels_label'],
-  },
-  {
     to: '/settings/network',
     label: 'settings.network',
     Icon: WifiIcon,
     Component: NetworkSettings,
     fields: ['settings.network', 'settings.proxy'],
-  },
-  {
-    to: '/settings/sharing',
-    label: 'sharing.title',
-    Icon: Share2Icon,
-    Component: SharingSettings,
-    fields: [
-      'sharing.title',
-      'sharing.local_network',
-      'sharing.tailscale_title',
-      'settings.remote_backend_title',
-    ],
   },
   {
     to: '/settings/credentials',
@@ -222,13 +198,6 @@ const extraSettings = [
     Icon: StethoscopeIcon,
     Component: DiagnosticsSettings,
     fields: ['about.diagnostics', 'about.self_check', 'about.save_bundle'],
-  },
-  {
-    to: '/settings/openapi',
-    label: 'openapi.title',
-    Icon: BracesIcon,
-    Component: OpenApiSettings,
-    fields: ['openapi.title', 'openapi.copy_url', 'openapi.open_raw'],
   },
 ] as const;
 
@@ -424,30 +393,25 @@ export function SettingsPage() {
                   </Link>
                 );
               })}
-            {extraMatches
-              .filter(({ to }) => to !== '/settings/support')
-              .map(({ to, label, Icon }) => (
-                <Link
-                  key={to}
-                  title={t(label)}
-                  to={to}
-                  aria-current={extra?.to === to ? 'page' : undefined}
-                  className={cn(
-                    buttonVariants({ variant: 'ghost', size: 'sm' }),
-                    settingsNavItemClass,
-                    'w-full justify-start',
-                    extra?.to === to && 'bg-sidebar-accent',
-                  )}
-                >
-                  <Icon className={settingsNavIconClass} />
-                  <span
-                    data-slot="settings-nav-label"
-                    className="min-w-0 flex-1 truncate text-left"
-                  >
-                    {t(label)}
-                  </span>
-                </Link>
-              ))}
+            {extraMatches.map(({ to, label, Icon }) => (
+              <Link
+                key={to}
+                title={t(label)}
+                to={to}
+                aria-current={extra?.to === to ? 'page' : undefined}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  settingsNavItemClass,
+                  'w-full justify-start',
+                  extra?.to === to && 'bg-sidebar-accent',
+                )}
+              >
+                <Icon className={settingsNavIconClass} />
+                <span data-slot="settings-nav-label" className="min-w-0 flex-1 truncate text-left">
+                  {t(label)}
+                </span>
+              </Link>
+            ))}
             <Link
               to="/settings/media"
               title={t('settings.audio_tools')}
@@ -486,21 +450,28 @@ export function SettingsPage() {
           )}
         </div>
         <div className="shrink-0 space-y-1.5 border-t border-sidebar-border/50 bg-background/15 p-3">
-          <Link
-            to="/settings/support"
-            title={t('donate.title')}
-            aria-current={extra?.to === '/settings/support' ? 'page' : undefined}
+          <a
+            href={REPOSITORY_URL}
+            target="_blank"
+            rel="noreferrer"
+            title={t('brand.source_code_hint')}
+            onClick={(event) => {
+              const bridge = getBridge();
+              if (!bridge) return;
+              event.preventDefault();
+              void bridge.files.openExternal(REPOSITORY_URL);
+            }}
             className={cn(
               buttonVariants({ variant: 'ghost' }),
-              'group relative w-full justify-start overflow-hidden border border-primary/20 bg-gradient-to-r from-primary/15 via-primary/8 to-transparent text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/10%)] transition-[border-color,background-color,box-shadow] hover:border-primary/35 hover:from-primary/20 hover:shadow-[0_8px_24px_-16px_var(--primary)]',
-              extra?.to === '/settings/support' && 'border-primary/40 bg-primary/15',
+              settingsNavItemClass,
+              'w-full justify-start',
             )}
           >
-            <HeartHandshakeIcon className="size-4 shrink-0 text-primary transition-transform duration-200 group-hover:scale-110 motion-reduce:transition-none" />
+            <CodeIcon className={settingsNavIconClass} />
             <span data-slot="settings-nav-label" className="min-w-0 flex-1 truncate text-left">
-              {t('donate.title')}
+              {t('brand.source_code')}
             </span>
-          </Link>
+          </a>
           <Link
             to="/clone"
             title={t('preferences.back')}
