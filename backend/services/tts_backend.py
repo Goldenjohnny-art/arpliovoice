@@ -19,9 +19,11 @@ dub generator consumes whole segments today.
 from __future__ import annotations
 
 import functools
+import hashlib
 import logging
 import os
 import re
+import tempfile
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -1106,6 +1108,77 @@ def _read_reference_mono(path: str):
     return audio, sr
 
 
+# Sidecar engines open references with their own venv's libsndfile, whose codec
+# support differs per wheel. A WhatsApp voice note (Ogg Opus), MP3 or M4A clip
+# cloned fine on OmniVoice (ffmpeg fallback) but failed in VoxCPM2/CosyVoice
+# with "Format not recognised". Sidecars therefore only ever receive WAV/FLAC.
+_SIDECAR_REFERENCE_FORMATS = frozenset({"WAV", "WAVEX", "FLAC"})
+_SIDECAR_REFERENCE_CACHE_MAX = 64
+
+
+def _sidecar_reference_cache_dir() -> str:
+    return os.path.join(tempfile.gettempdir(), "omnivoice-reference-wav")
+
+
+def sidecar_readable_reference(path):
+    """A reference path any sidecar can open: WAV/FLAC unchanged, every other
+    container decoded once (libsndfile, then ffmpeg) into a cached 16-bit WAV.
+
+    Fail-open: anything unexpected returns ``path`` untouched, so preparing the
+    reference is never the reason a generation fails.
+    """
+    if not isinstance(path, str) or not path or not os.path.isfile(path):
+        return path
+    try:
+        import soundfile as sf
+
+        if sf.info(path).format in _SIDECAR_REFERENCE_FORMATS:
+            return path
+    except Exception:  # noqa: BLE001 — unreadable here means "convert it"
+        pass
+    try:
+        import soundfile as sf
+
+        stat = os.stat(path)
+        key = hashlib.sha256(
+            f"{os.path.realpath(path)}|{stat.st_mtime_ns}|{stat.st_size}".encode()
+        ).hexdigest()[:32]
+        cache_dir = _sidecar_reference_cache_dir()
+        converted = os.path.join(cache_dir, f"{key}.wav")
+        if os.path.isfile(converted):
+            return converted
+        decoded = _read_reference_mono(path)
+        if decoded is None:
+            return path
+        audio, sr = decoded
+        os.makedirs(cache_dir, exist_ok=True)
+        partial = f"{converted}.{os.getpid()}.{threading.get_ident()}.partial"
+        sf.write(partial, audio, sr, subtype="PCM_16", format="WAV")
+        os.replace(partial, converted)
+        _prune_sidecar_reference_cache(cache_dir)
+        logger.info("Reference %s converted to WAV for a sidecar engine",
+                    os.path.basename(path))
+        return converted
+    except Exception:  # noqa: BLE001
+        logger.warning("Reference conversion for a sidecar failed; passing the original",
+                       exc_info=True)
+        return path
+
+
+def _prune_sidecar_reference_cache(cache_dir: str) -> None:
+    """Keep only the newest converted references; best-effort."""
+    try:
+        entries = sorted(
+            (e for e in os.scandir(cache_dir) if e.name.endswith(".wav")),
+            key=lambda e: e.stat().st_mtime,
+            reverse=True,
+        )
+        for entry in entries[_SIDECAR_REFERENCE_CACHE_MAX:]:
+            os.remove(entry.path)
+    except OSError:
+        pass
+
+
 def _omnivoice_installed_passage(ref_audio: str) -> Optional[tuple[str, str]]:
     """Pick a long clip's best 15 s window with the installed recognizer.
 
@@ -1837,7 +1910,7 @@ def prepare_voxcpm_reference(kw: dict) -> None:
     """
     if not kw.get("ref_audio"):
         return
-    kw["ref_audio"] = _prepare_voxcpm_ref(kw["ref_audio"])
+    kw["ref_audio"] = _prepare_voxcpm_ref(sidecar_readable_reference(kw["ref_audio"]))
     if kw.get("ref_text") and kw["ref_audio"] in _VOXCPM_CAPPED_REFS:
         logger.info(
             "VoxCPM2: reference capped at %.0fs; ignoring its whole-clip transcript",

@@ -800,6 +800,10 @@ class SubprocessBackend(TTSBackend):
         legacy int16 frames from existing installations.
         """
         self._check_language(kw.get("language"))
+        if isinstance(kw.get("ref_audio"), str):
+            # The sidecar's own libsndfile may not open Opus/MP3/M4A clips.
+            from services.tts_backend import sidecar_readable_reference
+            kw["ref_audio"] = sidecar_readable_reference(kw["ref_audio"])
         # On-pool callers (every HTTP/dub/batch generate, dispatched via
         # run_on_gpu_pool_guarded) already own a pool slot; re-acquiring would
         # self-deadlock on a 1-worker (MPS) pool, so skip it. Off-pool callers

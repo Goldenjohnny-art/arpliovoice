@@ -44,6 +44,7 @@ _REF_ALLOWLIST = (
     # owner-directed Arplio Voice rebrand (2026-10-23), no issue
     "Settings → Source code link and an About credit to VoiceStudio",
     "Engine test notebook: clone one voice with every commercially licensed engine",
+    "WhatsApp voice notes (Ogg Opus), MP3 and M4A clips now clone on VoxCPM2",
     # owner commit 7036e101 — first-run consent prompt, committed straight to main
     "First-run consent question for the existing opt-in analytics",
     # owner commits ce842737 + dc766baf — Colab notebook, committed straight to main
