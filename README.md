@@ -52,6 +52,7 @@ your text and generate. Install the required model when prompted.
 |---|---|
 | Setup help | [Troubleshooting](docs/install/troubleshooting.md) · [Model downloads](docs/downloading-models.md) |
 | Models & audio quality | [Engine guides](docs/engines/README.md) · [Benchmarks](docs/benchmarks.md) |
+| Compare engines you can sell with | [Engine test on a free Colab GPU](https://colab.research.google.com/github/Goldenjohnny-art/arpliovoice/blob/arplio-voice/notebooks/Arplio_Voice_Engine_Test.ipynb) |
 | Development | [Electron](electron/README.md) · [Changelog](CHANGELOG.md) |
 
 ## License & responsible use

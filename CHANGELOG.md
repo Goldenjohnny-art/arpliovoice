@@ -27,6 +27,7 @@ metadata and the backend fallback mirror it.
 ### Added
 
 - Settings → Source code link and an About credit to VoiceStudio, as the AGPL-3.0 requires
+- Engine test notebook: clone one voice with every commercially licensed engine side by side on a free Colab GPU
 
 - Preview iOS and Android companion apps: drive your own VoiceStudio from your phone (speak, voices and cloning, dubbing, dictation) after pairing by QR code; build from source for now ([guide](docs/mobile.md)) (#2965)
 - Smart Fit speed limits: set the fastest and slowest speed dubbing may apply to a line, from the Timing section (#3026) — thanks @MoonDragon-MD!
